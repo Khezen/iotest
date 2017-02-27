@@ -6,12 +6,12 @@ Library based on chai to make input/output test easier.
 
 `npm install iotest --save-dev`
 
-iotest.return example
+sychronized return statement example
 ```
 
 ```
 
-iotest.promise example
+promise example
 ```
 
 ```
