@@ -1,0 +1,26 @@
+{
+  "name": "iotest",
+  "version": "1.0.0",
+  "description": "test input/output",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khezen/iotest.git"
+  },
+  "keywords": [
+    "test",
+    "unit",
+    "input",
+    "output",
+    "chai"
+  ],
+  "author": "Guillaume Simonneau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/khezen/iotest/issues"
+  },
+  "homepage": "https://github.com/khezen/iotest#readme"
+}
