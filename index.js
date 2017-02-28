@@ -36,8 +36,8 @@ function iotest(cases, procedure){
 
   let scenario = null;
   try{
-    scenario = toArray(scenario);
-    let step = cases.shift();
+    scenario = toArray(cases);
+    let step = scenario.shift();
     if(step.return){
       returnStatement(step, procedure);
     }else if(step.then || step.catch){
