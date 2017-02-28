@@ -1,4 +1,5 @@
 "use strict";
+
 const chai = require("chai");
 const assert = chai.assert;
 
@@ -30,7 +31,6 @@ function validate(result, expected){
   }
   return valid;
 }
-
 
 function iotest(scenario, procedure){
 
