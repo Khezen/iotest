@@ -38,24 +38,17 @@ function validate(step, result, expected){
 
 function iotest(cases, procedure){
 
-  let scenario = null;
-  let step = null;
-  let printableCase = "";
-  try{
-    scenario = toArray(cases);
-    step = scenario.shift();
-    printableCase = JSON.stringify(step);
-    if(step.return){
-      returnStatement();
-    }else if(step.then || step.catch){
-      promise();
-    }else if(step.error){
-      error();
-    }else{
-      assert(false, `case: ${printableCase}, unsupported test case`);
-    }
-  }catch(err){
-    assert(false, `case: ${printableCase}, ${err.message}`);
+  let scenario = toArray(cases);
+  let step = scenario.shift();
+  let printableCase = JSON.stringify(step);
+  if(step.return){
+    returnStatement();
+  }else if(step.then || step.catch){
+    promise();
+  }else if(step.error){
+    error();
+  }else{
+    assert(false, `case: ${printableCase}, unsupported test case`);
   }
 
   function returnStatement(){
