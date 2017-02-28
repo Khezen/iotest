@@ -11,7 +11,7 @@ function toArray(input){
   }
 }
 
-function validate(step, printableFunc, result, expected){
+function validate(step, result, expected){
   const printableCase = JSON.stringify(step);
   const printableResult = result instanceof Object?JSON.stringify(result): result;
   function deepValidation(got, exp){
@@ -28,7 +28,7 @@ function validate(step, printableFunc, result, expected){
       }
     }else{
       valid = got === exp;
-      assert(valid, `function: ${printableFunc}, case: ${printableCase}, got: ${printableResult}`);
+      assert(valid, `case: ${printableCase}, got: ${printableResult}`);
     }
     return valid;
   }
@@ -41,7 +41,6 @@ function iotest(cases, procedure){
   let scenario = null;
   let step = null;
   let printableCase = "";
-  let printableFunc =  /^function\s+([\w\$]+)\s*\(/.exec( procedure.toString() )
   try{
     scenario = toArray(cases);
     step = scenario.shift();
@@ -53,16 +52,16 @@ function iotest(cases, procedure){
     }else if(step.error){
       error();
     }else{
-      assert(false, `func: ${printableFunc}, case: ${printableCase}, unsupported test case`);
+      assert(false, `case: ${printableCase}, unsupported test case`);
     }
   }catch(err){
-    assert(false, `func: ${printableFunc}, case: ${printableCase}, ${err.message}`);
+    assert(false, `case: ${printableCase}, ${err.message}`);
   }
 
   function returnStatement(){
     let input = toArray(step.in);
     let result = procedure.apply({}, input);
-    validate(step, printableFunc, result, step.return);
+    validate(step, result, step.return);
     resume();
   }
 
@@ -71,19 +70,19 @@ function iotest(cases, procedure){
     procedure.apply({}, input).
     then(function(result){
       if(step.then){
-        assert(true, `func: ${printableFunc}, case: ${printableCase}, expected resolve`);
-        validate(step, printableFunc, result, step.then);
+        assert(true, `case: ${printableCase}, expected resolve`);
+        validate(step, result, step.then);
       }else{
-        assert(false, `func: ${printableFunc}, case: ${printableCase}, unexpected resolve`);
+        assert(false, `case: ${printableCase}, unexpected resolve`);
       }
       resume();
     }).
     catch(function(err){
       if(step.catch){
-        assert(true, `func: ${printableFunc}, case: ${printableCase},  expected reject`);
-        validate(step, printableFunc, err, step.catch);
+        assert(true, `case: ${printableCase},  expected reject`);
+        validate(step, err, step.catch);
       }else{
-        assert(false, `func: ${printableFunc}, case: ${printableCase},  unexpected reject`);
+        assert(false, `case: ${printableCase},  unexpected reject`);
       }
       resume();
     });
