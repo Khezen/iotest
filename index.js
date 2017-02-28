@@ -85,10 +85,10 @@ function iotest(cases, procedure){
     let input = toArray(step.in);
     try{
       procedure.apply({}, input);
-      assert(false, `func: ${printableFunc}, case: ${printableCase},  unexpected success`);
+      assert(false, `case: ${printableCase},  unexpected success`);
     }catch(err){
-      assert(true, `func: ${printableFunc}, case: ${printableCase},  expected error`);
-      validate(step, printableFunc, err, step.error);
+      assert(true, `case: ${printableCase},  expected error`);
+      validate(step, err, step.error);
     }finally{
       resume();
     }
