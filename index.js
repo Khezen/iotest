@@ -31,39 +31,18 @@ function validate(result, expected){
   return valid;
 }
 
-function returnStatement(testCase, procedure){
-  let input = toArray(testCase.in);
-  let result = procedure.apply({}, input);
-  validate(result, testCase.return);
-}
 
-function promise(testCase, procedure){
-  let input = toArray(testCase.in);
-  procedure.apply({}, input).
-  then(function(result){
-    if(testCase.then){
-      validate(result, testCase.then);
-    }else{
-      assert(false, "unexpected resolve");
-    }
-  }).
-  catch(function(err){
-    if(testCase.catch){
-      validate(err, testCase.catch);
-    }else{
-      assert(false, "unexpected reject");
-    }
-  });
-}
+function iotest(scenario, procedure){
 
-module.exports = function(scenario, procedure){
+  let cases = toArray(scenario);
   try{
-    let cases = toArray(scenario);
-    let testCase = cases[0];
+    let testCase = cases.shift();
     if(testCase.return){
       returnStatement(testCase, procedure);
     }else if(testCase.then || testCase.catch){
       promise(testCase, procedure);
+    }else if(testCase.error){
+      error(testCase, procedure);
     }else{
       assert(false, "unsupported test case");
     }
@@ -71,4 +50,55 @@ module.exports = function(scenario, procedure){
     assert(false, err.message);
   }
 
-};
+  function returnStatement(testCase, procedure){
+    let input = toArray(testCase.in);
+    let result = procedure.apply({}, input);
+    validate(result, testCase.return);
+    resume();
+  }
+
+  function promise(testCase, procedure){
+    let input = toArray(testCase.in);
+    procedure.apply({}, input).
+    then(function(result){
+      if(testCase.then){
+        assert(true, "expected resolve");
+        validate(result, testCase.then);
+      }else{
+        assert(false, "unexpected resolve");
+      }
+      resume();
+    }).
+    catch(function(err){
+      if(testCase.catch){
+        assert(true, "expected reject");
+        validate(err, testCase.catch);
+      }else{
+        assert(false, "unexpected reject");
+      }
+      resume();
+    });
+  }
+
+  function error(testCase, procedure){
+    let input = toArray(testCase.in);
+    try{
+      procedure.apply({}, input);
+      assert(false, "unexpected success");
+    }catch(err){
+      assert(true, "expected error");
+      validate(err, testCase.error);
+    }finally{
+      resume();
+    }
+  }
+
+  function resume(){
+    if(cases.length){
+      iotest(cases, procedure);
+    }
+  }
+
+}
+
+module.exports = iotest;
