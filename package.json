@@ -1,6 +1,6 @@
 {
   "name": "iotest",
-  "version": "1.0.8",
+  "version": "1.0.12",
   "description": "test input/output",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "url": "https://github.com/khezen/iotest/issues"
   },
   "homepage": "https://github.com/khezen/iotest#readme",
-  "devDependencies": {
+  "dependencies": {
     "chai": "^3.5.0"
   }
 }

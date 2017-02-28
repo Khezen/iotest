@@ -11,84 +11,91 @@ function toArray(input){
   }
 }
 
-function validate(result, expected){
-  let valid = false;
-  if(expected instanceof Object){
-    for (let prop in expected){
-      if (expected.hasOwnProperty(prop)){
-        valid = validate(result[prop], expected[prop]);
-        assert(valid, `expected: ${expected}, got: ${result}`);
+function validate(step, func, result, expected){
+  const printableCase = JSON.stringify(step);
+  const printableResult = result instanceof Object?JSON.stringify(result): result;
+  function deepValidation(got, exp){
+    let valid = false;
+    if(exp instanceof Object){
+      for (let prop in exp){
+        if (exp.hasOwnProperty(prop)){
+          valid = deepValidation(got[prop], exp[prop]);
+        }
       }
+    }else if(exp instanceof Array){
+      for(let i = 0; i < exp.length; i++){
+        valid = deepValidation(got[i], exp[i]);
+      }
+    }else{
+      valid = got === exp;
+      assert(valid, `function: ${func.name}, case: ${printableCase}, got: ${printableResult}`);
     }
-  }else if(expected instanceof Array){
-    for(let i = 0; i < expected.length; i++){
-      valid = validate(result[i], expected[i]);
-      assert(valid, `expected: ${expected}, got: ${result}`);
-    }
-  }else{
-    valid = result === expected;
-    assert(valid, `expected: ${expected}, got: ${result}`);
+    return valid;
   }
-  return valid;
+
+  deepValidation(result, expected);
 }
 
 function iotest(cases, procedure){
 
   let scenario = null;
+  let step = null;
+  let printableCase = "";
   try{
     scenario = toArray(cases);
-    let step = scenario.shift();
+    step = scenario.shift();
+    printableCase = JSON.stringify(step);
     if(step.return){
-      returnStatement(step, procedure);
+      returnStatement();
     }else if(step.then || step.catch){
-      promise(step, procedure);
+      promise();
     }else if(step.error){
-      error(step, procedure);
+      error();
     }else{
-      assert(false, "unsupported test case");
+      assert(false, `func: ${procedure.name}, case: ${printableCase} => unsupported test case`);
     }
   }catch(err){
-    assert(false, err.message);
+    assert(false, `func: ${procedure.name}, case: ${printableCase} => ${err.message}`);
   }
 
-  function returnStatement(step, procedure){
+  function returnStatement(){
     let input = toArray(step.in);
     let result = procedure.apply({}, input);
-    validate(result, step.return);
+    validate(step, procedure, result, step.return);
     resume();
   }
 
-  function promise(step, procedure){
+  function promise(){
     let input = toArray(step.in);
     procedure.apply({}, input).
     then(function(result){
       if(step.then){
-        assert(true, "expected resolve");
-        validate(result, step.then);
+        assert(true, `func: ${procedure.name}, case: ${printableCase} => expected resolve`);
+        validate(step, procedure, result, step.then);
       }else{
-        assert(false, "unexpected resolve");
+        assert(false, `func: ${procedure.name}, case: ${printableCase} => unexpected resolve`);
       }
       resume();
     }).
     catch(function(err){
       if(step.catch){
-        assert(true, "expected reject");
-        validate(err, step.catch);
+        assert(true, `func: ${procedure.name}, case: ${printableCase} => expected reject`);
+        validate(step, procedure, err, step.catch);
       }else{
-        assert(false, "unexpected reject");
+        assert(false, `func: ${procedure.name}, case: ${printableCase} => unexpected reject`);
       }
       resume();
     });
   }
 
-  function error(step, procedure){
+  function error(){
     let input = toArray(step.in);
     try{
       procedure.apply({}, input);
-      assert(false, "unexpected success");
+      assert(false, `func: ${procedure.name}, case: ${printableCase} => unexpected success`);
     }catch(err){
-      assert(true, "expected error");
-      validate(err, step.error);
+      assert(true, `func: ${procedure.name}, case: ${printableCase} => expected error`);
+      validate(step, procedure, err, step.error);
     }finally{
       resume();
     }
