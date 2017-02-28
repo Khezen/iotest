@@ -52,10 +52,10 @@ function iotest(cases, procedure){
     }else if(step.error){
       error();
     }else{
-      assert(false, `func: ${procedure.name}, case: ${printableCase} => unsupported test case`);
+      assert(false, `func: ${procedure.name}, case: ${printableCase}, unsupported test case`);
     }
   }catch(err){
-    assert(false, `func: ${procedure.name}, case: ${printableCase} => ${err.message}`);
+    assert(false, `func: ${procedure.name}, case: ${printableCase}, ${err.message}`);
   }
 
   function returnStatement(){
@@ -70,19 +70,19 @@ function iotest(cases, procedure){
     procedure.apply({}, input).
     then(function(result){
       if(step.then){
-        assert(true, `func: ${procedure.name}, case: ${printableCase} => expected resolve`);
+        assert(true, `func: ${procedure.name}, case: ${printableCase}, expected resolve`);
         validate(step, procedure, result, step.then);
       }else{
-        assert(false, `func: ${procedure.name}, case: ${printableCase} => unexpected resolve`);
+        assert(false, `func: ${procedure.name}, case: ${printableCase}, unexpected resolve`);
       }
       resume();
     }).
     catch(function(err){
       if(step.catch){
-        assert(true, `func: ${procedure.name}, case: ${printableCase} => expected reject`);
+        assert(true, `func: ${procedure.name}, case: ${printableCase},  expected reject`);
         validate(step, procedure, err, step.catch);
       }else{
-        assert(false, `func: ${procedure.name}, case: ${printableCase} => unexpected reject`);
+        assert(false, `func: ${procedure.name}, case: ${printableCase},  unexpected reject`);
       }
       resume();
     });
@@ -92,9 +92,9 @@ function iotest(cases, procedure){
     let input = toArray(step.in);
     try{
       procedure.apply({}, input);
-      assert(false, `func: ${procedure.name}, case: ${printableCase} => unexpected success`);
+      assert(false, `func: ${procedure.name}, case: ${printableCase},  unexpected success`);
     }catch(err){
-      assert(true, `func: ${procedure.name}, case: ${printableCase} => expected error`);
+      assert(true, `func: ${procedure.name}, case: ${printableCase},  expected error`);
       validate(step, procedure, err, step.error);
     }finally{
       resume();

@@ -1,6 +1,6 @@
 {
   "name": "iotest",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "test input/output",
   "main": "index.js",
   "scripts": {
