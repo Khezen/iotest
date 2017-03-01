@@ -43,15 +43,15 @@ function iotest(cases, procedure){
   let step = null;
   let printableCase = null;
 
-  function returnStatement(resolve, reject){
+  function returnStatement(){
     let inputs = toArray(step.inputs);
     let result = procedure.apply({}, inputs);
     results.push(result);
     validate(step, result, step.return);
-    resume(resolve, reject);
+    resume();
   }
 
-  function promise(resolve, reject){
+  function promise(){
     let inputs = toArray(step.inputs);
     procedure.apply({}, inputs).
     then(function(result){
@@ -62,7 +62,7 @@ function iotest(cases, procedure){
       }else{
         assert(false, `case: ${printableCase}, unexpected resolve`);
       }
-      resume(resolve, reject);
+      resume();
     }).
     catch(function(err){
       results.push(err);
@@ -72,11 +72,11 @@ function iotest(cases, procedure){
       }else{
         assert(false, `case: ${printableCase},  unexpected reject`);
       }
-      resume(resolve, reject);
+      resume();
     });
   }
 
-  function error(resolve, reject){
+  function error(){
     let inputs = toArray(step.inputs);
     try{
       let result = procedure.apply({}, inputs);
@@ -87,42 +87,31 @@ function iotest(cases, procedure){
       assert(true, `case: ${printableCase},  expected error`);
       validate(step, err, step.throw);
     }finally{
-      resume(resolve, reject);
+      resume();
     }
   }
 
-  function resume(resolve, reject){
+  function resume(){
     if(cases.length){
-      iotest(cases, procedure).
-      then((moreResults) => {
-        results = results.concat(moreResults);
-        resolve(results);
-      }).
-      catch((err) =>{
-        reject(err);
-      });
-    }else{
-      resolve(results);
+      iotest(cases, procedure);
     }
   }
 
-  return new Promise((resolve, reject) => {
-    try{
-      scenario = toArray(cases);
-      step = scenario.shift();
-      printableCase = JSON.stringify(step).replace("\\", "");
-      if(step.return){
-        returnStatement(resolve, reject);
-      }else if(step.resolve || step.reject){
-        promise(resolve, reject);
-      }else if(step.throw){
-        error(resolve, reject);
-      }else{
-        assert(false, `case: ${printableCase}, unsupported test case`);
-      }
-    }catch(err){
-      reject(err);
+  try{
+    scenario = toArray(cases);
+    step = scenario.shift();
+    printableCase = JSON.stringify(step).replace("\\", "");
+    if(step.return){
+      returnStatement();
+    }else if(step.resolve || step.reject){
+      promise();
+    }else if(step.throw){
+      error();
+    }else{
+      assert(false, `case: ${printableCase}, unsupported test case`);
     }
-  });
+  }catch(err){
+    throw err;
+  }
 }
 module.exports = iotest;
