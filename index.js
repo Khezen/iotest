@@ -103,7 +103,7 @@ function iotest(cases, procedure){
     }
   }
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     try{
       scenario = toArray(cases);
       step = scenario.shift();
@@ -118,7 +118,7 @@ function iotest(cases, procedure){
         assert(false, `case: ${printableCase}, unsupported test case`);
       }
     }catch(err){
-      assert(false, `unexpected error occure while testing: ${err.message}`);
+      reject(err);
     }
   });
 }
