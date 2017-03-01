@@ -40,40 +40,40 @@ function iotest(cases, procedure){
 
   let scenario = toArray(cases);
   let step = scenario.shift();
-  let printableCase = JSON.stringify(step);
+  let printableCase = JSON.stringify(step).replace("\\", "");
   if(step.return){
     returnStatement();
-  }else if(step.then || step.catch){
+  }else if(step.resolve || step.reject){
     promise();
-  }else if(step.error){
+  }else if(step.throw){
     error();
   }else{
     assert(false, `case: ${printableCase}, unsupported test case`);
   }
 
   function returnStatement(){
-    let input = toArray(step.in);
-    let result = procedure.apply({}, input);
+    let inputs = toArray(step.inputs);
+    let result = procedure.apply({}, inputs);
     validate(step, result, step.return);
     resume();
   }
 
   function promise(){
-    let input = toArray(step.in);
-    procedure.apply({}, input).
+    let inputs = toArray(step.inputs);
+    procedure.apply({}, inputs).
     then(function(result){
-      if(step.then){
+      if(step.resolve){
         assert(true, `case: ${printableCase}, expected resolve`);
-        validate(step, result, step.then);
+        validate(step, result, step.resolve);
       }else{
         assert(false, `case: ${printableCase}, unexpected resolve`);
       }
       resume();
     }).
     catch(function(err){
-      if(step.catch){
+      if(step.reject){
         assert(true, `case: ${printableCase},  expected reject`);
-        validate(step, err, step.catch);
+        validate(step, err, step.reject);
       }else{
         assert(false, `case: ${printableCase},  unexpected reject`);
       }
@@ -82,13 +82,13 @@ function iotest(cases, procedure){
   }
 
   function error(){
-    let input = toArray(step.in);
+    let inputs = toArray(step.inputs);
     try{
-      procedure.apply({}, input);
+      procedure.apply({}, inputs);
       assert(false, `case: ${printableCase},  unexpected success`);
     }catch(err){
       assert(true, `case: ${printableCase},  expected error`);
-      validate(step, err, step.error);
+      validate(step, err, step.throw);
     }finally{
       resume();
     }
