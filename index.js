@@ -38,68 +38,88 @@ function validate(step, result, expected){
 
 function iotest(cases, procedure){
 
-  let scenario = toArray(cases);
-  let step = scenario.shift();
-  let printableCase = JSON.stringify(step).replace("\\", "");
-  if(step.return){
-    returnStatement();
-  }else if(step.resolve || step.reject){
-    promise();
-  }else if(step.throw){
-    error();
-  }else{
-    assert(false, `case: ${printableCase}, unsupported test case`);
-  }
+  let results = [];
+  let scenario = null;
+  let step = null;
+  let printableCase = null;
 
-  function returnStatement(){
+  function returnStatement(resolve){
     let inputs = toArray(step.inputs);
     let result = procedure.apply({}, inputs);
+    results.push(result);
     validate(step, result, step.return);
-    resume();
+    resume(resolve);
   }
 
-  function promise(){
+  function promise(resolve){
     let inputs = toArray(step.inputs);
     procedure.apply({}, inputs).
     then(function(result){
+      results.push(result);
       if(step.resolve){
         assert(true, `case: ${printableCase}, expected resolve`);
         validate(step, result, step.resolve);
       }else{
         assert(false, `case: ${printableCase}, unexpected resolve`);
       }
-      resume();
+      resume(resolve);
     }).
     catch(function(err){
+      results.push(err);
       if(step.reject){
         assert(true, `case: ${printableCase},  expected reject`);
         validate(step, err, step.reject);
       }else{
         assert(false, `case: ${printableCase},  unexpected reject`);
       }
-      resume();
+      resume(resolve);
     });
   }
 
-  function error(){
+  function error(resolve){
     let inputs = toArray(step.inputs);
     try{
-      procedure.apply({}, inputs);
+      let result = procedure.apply({}, inputs);
+      results.push(result);
       assert(false, `case: ${printableCase},  unexpected success`);
     }catch(err){
+      results.push(err);
       assert(true, `case: ${printableCase},  expected error`);
       validate(step, err, step.throw);
     }finally{
-      resume();
+      resume(resolve);
     }
   }
 
-  function resume(){
+  function resume(resolve){
     if(cases.length){
-      iotest(cases, procedure);
+      iotest(cases, procedure).
+      then((moreResults) => {
+        results = results.concat(moreResults);
+        resolve(results);
+      });
+    }else{
+      resolve(results);
     }
   }
 
+  return new Promise((resolve) => {
+    try{
+      scenario = toArray(cases);
+      step = scenario.shift();
+      printableCase = JSON.stringify(step).replace("\\", "");
+      if(step.return){
+        returnStatement(resolve);
+      }else if(step.resolve || step.reject){
+        promise(resolve);
+      }else if(step.throw){
+        error(resolve);
+      }else{
+        assert(false, `case: ${printableCase}, unsupported test case`);
+      }
+    }catch(err){
+      assert(false, `unexpected error occure while testing: ${err.message}`);
+    }
+  });
 }
-
 module.exports = iotest;
