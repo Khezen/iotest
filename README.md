@@ -1,3 +1,5 @@
+[![NPM Version](http://img.shields.io/npm/v/iotest.svg?style=flat)](https://www.npmjs.org/package/iotest)
+
 # iotest
 
 Javascript library which makes input/output testing a no-brainer.
