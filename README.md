@@ -158,7 +158,7 @@ catch(err => { /* tests failed */ });
 ```
 
 ## depth traversal
-if you set `case.return`, `case.error`, `case.resolve` or `case.reject` with an *Object*, then it is deeply traversed to make sure each property exists with the right value in the `output`.
+if `case.return`, `case.error`, `case.resolve` or `case.reject` is set with an *Object*, then it is deeply traversed to make sure each property exists with the right value in the `output`.
 
 ```
 function f(x){
@@ -184,7 +184,7 @@ then(outputs => { /* tests succeed */ }).
 catch(err => { /* tests failed */ });
 ```
 
-if you set `case.return`, `case.error`, `case.resolve` or `case.reject` with an *Array*, then each item is deeply traversed.
+if `case.return`, `case.error`, `case.resolve` or `case.reject` is set with an *Array*, then each item is deeply traversed.
 
 ```
 function f(x){
