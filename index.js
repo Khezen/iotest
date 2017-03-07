@@ -11,20 +11,20 @@ function toArray(input){
   }
 }
 
-function validate(step, result, expected){
+function validate(step, expected, result){
   const printableCase = JSON.stringify(step);
   const printableResult = result instanceof Object?JSON.stringify(result): result;
-  function deepValidation(got, exp){
+  function deepValidation(exp, got){
     let valid = false;
     if(exp instanceof Object){
       for (let prop in exp){
         if (exp.hasOwnProperty(prop)){
-          valid = deepValidation(got[prop], exp[prop]);
+          valid = deepValidation(exp[prop], got[prop]);
         }
       }
     }else if(exp instanceof Array){
       for(let i = 0; i < exp.length; i++){
-        valid = deepValidation(got[i], exp[i]);
+        valid = deepValidation(exp[i], got[i]);
       }
     }else{
       valid = got === exp;
@@ -33,7 +33,7 @@ function validate(step, result, expected){
     return valid;
   }
 
-  deepValidation(result, expected);
+  deepValidation(expected, result);
 }
 
 function iotest(cases, procedure){
@@ -47,7 +47,7 @@ function iotest(cases, procedure){
     let inputs = toArray(step.inputs);
     let result = procedure.apply({}, inputs);
     results.push(result);
-    validate(step, result, step.return);
+    validate(step, step.return, result);
     resume();
   }
 
@@ -58,7 +58,7 @@ function iotest(cases, procedure){
       results.push(result);
       if(step.resolve){
         assert(true, `case: ${printableCase}, expected resolve`);
-        validate(step, result, step.resolve);
+        validate(step, step.resolve, result);
       }else{
         assert(false, `case: ${printableCase}, unexpected resolve`);
       }
@@ -68,7 +68,7 @@ function iotest(cases, procedure){
       results.push(err);
       if(step.reject){
         assert(true, `case: ${printableCase},  expected reject`);
-        validate(step, err, step.reject);
+        validate(step, step.reject, err);
       }else{
         assert(false, `case: ${printableCase},  unexpected reject`);
       }
@@ -85,7 +85,7 @@ function iotest(cases, procedure){
     }catch(err){
       results.push(err);
       assert(true, `case: ${printableCase},  expected error`);
-      validate(step, err, step.throw);
+      validate(step, step.throw, err);
     }finally{
       resume();
     }
@@ -97,21 +97,17 @@ function iotest(cases, procedure){
     }
   }
 
-  try{
-    scenario = toArray(cases);
-    step = scenario.shift();
-    printableCase = JSON.stringify(step).replace("\\", "");
-    if(step.return){
-      returnStatement();
-    }else if(step.resolve || step.reject){
-      promise();
-    }else if(step.throw){
-      error();
-    }else{
-      assert(false, `case: ${printableCase}, unsupported test case`);
-    }
-  }catch(err){
-    throw err;
+  scenario = toArray(cases);
+  step = scenario.shift();
+  printableCase = JSON.stringify(step).replace("\\", "");
+  if(step.return){
+    returnStatement();
+  }else if(step.resolve || step.reject){
+    promise();
+  }else if(step.throw){
+    error();
+  }else{
+    assert(false, `case: ${printableCase}, unsupported test case`);
   }
 }
 module.exports = iotest;
