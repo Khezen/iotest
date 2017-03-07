@@ -81,8 +81,8 @@ const cases = [
 ];      
 
 iotest(cases, f).
-then{outputs => { /* tests succeed */ } }.
-catch{err => { /* tests failed */ } };
+then(outputs => { /* tests succeed */ }).
+catch(err => { /* tests failed */ });
 ```
 
 ### multiple inputs
@@ -98,8 +98,8 @@ const iotest = require('iotest');
 const case = { inputs: [10, 32], return: 42} // succeed    
 
 iotest(case, f).
-then{outputs => { /* tests succeed */ } }.
-catch{err => { /* tests failed */ } };
+then(outputs => { /* tests succeed */ }).
+catch(err => { /* tests failed */ });
 ```
 
 ## `case.return` - `case.error`
@@ -123,8 +123,8 @@ const cases = [
 ];   
 
 iotest(cases, f).
-then{outputs => { /* tests succeed */ } }.
-catch{err => { /* tests failed */ } };
+then(outputs => { /* tests succeed */ }).
+catch(err => { /* tests failed */ });
 ```
 
 ## `case.resolve` - `case.reject`
@@ -153,8 +153,8 @@ const cases = [
 ];   
 
 iotest(cases, f).
-then{outputs => { /* tests succeed */ } }.
-catch{err => { /* tests failed */ } };
+then(outputs => { /* tests succeed */ }).
+catch(err => { /* tests failed */ });
 ```
 
 ## depth traversal
@@ -180,8 +180,8 @@ const cases = [
 ];
 
 iotest(cases, f).
-then{outputs => { /* tests succeed */ } }.
-catch{err => { /* tests failed */ } };
+then(outputs => { /* tests succeed */ }).
+catch(err => { /* tests failed */ });
 ```
 
 if you set `case.return`, `case.error`, `case.resolve` or `case.reject` with an *Array*, then each item is deeply traversed.
@@ -209,6 +209,6 @@ const case = {
 
 
 iotest(case, f).
-then{outputs => { /* tests succeed */ } }.
-catch{err => { /* tests failed */ } };
+then(outputs => { /* tests succeed */ }).
+catch(err => { /* tests failed */ });
 ```
