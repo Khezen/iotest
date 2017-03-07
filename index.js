@@ -11,9 +11,9 @@ function toArray(input){
   }
 }
 
-function validate(step, expected, result){
+function validate(step, expected, output){
   const printableCase = JSON.stringify(step);
-  const printableResult = result instanceof Object?JSON.stringify(result): result;
+  const printableoutput = output instanceof Object?JSON.stringify(output): output;
   function deepValidation(exp, got){
     let valid = false;
     if(exp instanceof Object){
@@ -28,44 +28,44 @@ function validate(step, expected, result){
       }
     }else{
       valid = got === exp;
-      assert(valid, `case: ${printableCase}, got: ${printableResult}`);
+      assert(valid, `case: ${printableCase}, got: ${printableoutput}`);
     }
     return valid;
   }
 
-  deepValidation(expected, result);
+  deepValidation(expected, output);
 }
 
 function iotest(cases, procedure){
 
-  let results = [];
+  let outputs = [];
   let scenario = null;
   let step = null;
   let printableCase = null;
 
   function returnStatement(resolve, reject){
     let inputs = toArray(step.inputs);
-    let result = procedure.apply({}, inputs);
-    results.push(result);
-    validate(step, step.return, result);
+    let output = procedure.apply({}, inputs);
+    outputs.push(output);
+    validate(step, step.return, output);
     resume(resolve, reject);
   }
 
   function promise(resolve, reject){
     let inputs = toArray(step.inputs);
     procedure.apply({}, inputs).
-    then(function(result){
-      results.push(result);
+    then(output => {
+      outputs.push(output);
       if(step.resolve){
         assert(true, `case: ${printableCase}, expected resolve`);
-        validate(step, step.resolve, result);
+        validate(step, step.resolve, output);
       }else{
         assert(false, `case: ${printableCase}, unexpected resolve`);
       }
       resume(resolve, reject);
     }).
-    catch(function(err){
-      results.push(err);
+    catch( err => {
+      outputs.push(err);
       if(step.reject){
         assert(true, `case: ${printableCase},  expected reject`);
         validate(step, step.reject, err);
@@ -79,11 +79,11 @@ function iotest(cases, procedure){
   function error(resolve, reject){
     let inputs = toArray(step.inputs);
     try{
-      let result = procedure.apply({}, inputs);
-      results.push(result);
+      let output = procedure.apply({}, inputs);
+      outputs.push(output);
       assert(false, `case: ${printableCase},  unexpected success`);
     }catch(err){
-      results.push(err);
+      outputs.push(err);
       assert(true, `case: ${printableCase},  expected error`);
       validate(step, step.throw, err);
     }finally{
@@ -94,15 +94,15 @@ function iotest(cases, procedure){
   function resume(resolve, reject){
     if(cases.length){
       iotest(cases, procedure).
-      then( (moreResults) => {
-        results = results.concat(moreResults);
-        resolve(results);
+      then( moreoutputs => {
+        outputs = outputs.concat(moreoutputs);
+        resolve(outputs);
       }).
-      catch( (err) => {
+      catch( err => {
         reject(err);
       });
     }else{
-      resolve(results);
+      resolve(outputs);
     }
   }
 
