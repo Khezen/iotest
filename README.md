@@ -63,7 +63,7 @@ describe('f', () => {
 # case
 JSON object describing a test case.
 
-## `case.inputs`
+## case.inputs
 Given arguments of a function.
 ### single input
 ```
@@ -102,8 +102,8 @@ then(outputs => { /* tests succeed */ }).
 catch(err => { /* tests failed */ });
 ```
 
-## `case.return` - `case.error`
-Expected returned output of a function - expected error thrown by a function.
+## case.return / case.error
+Expected returned output of a function / Expected error thrown by a function.
 
 ```
 function f(x, y){
@@ -127,10 +127,8 @@ then(outputs => { /* tests succeed */ }).
 catch(err => { /* tests failed */ });
 ```
 
-## `case.resolve` - `case.reject`
-Expected resolved value - expected rejected error
-
-of the promise returned by a function.
+## case.resolve / case.reject
+Expected resolved value / Expected rejected error, of the promise returned by a function.
 
 ```
 function f(x, y){
