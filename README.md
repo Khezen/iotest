@@ -8,7 +8,7 @@ Javascript library which makes input/output testing a no-brainer.
 `npm install --save-dev iotest`
 
 # example with mocha
-```
+```javascript
 function f(x){
   return x + 1;
 }
@@ -16,7 +16,7 @@ function f(x){
 
 Test cases are processed sequentially when testing multiple cases:
 
-```
+```javascript
 const iotest = require('iotest');
 
 describe('f', () => {
@@ -40,7 +40,7 @@ describe('f', () => {
 ```
 
 Testing one case:
-```
+```javascript
 const iotest = require('iotest');
 
 describe('f', () => {
@@ -66,13 +66,13 @@ JSON object describing a test case.
 ## case.inputs
 Given arguments of a function.
 ### single input
-```
+```javascript
 function f(x){
   return x + 1;
 }
 ```
 
-```
+```javascript
 const iotest = require('iotest');
 
 const cases = [
@@ -86,13 +86,13 @@ catch(err => { /* tests failed */ });
 ```
 
 ### multiple inputs
-```
+```javascript
 function f(x, y){
   return x + y;
 }
 ```
 
-```
+```javascript
 const iotest = require('iotest');
 
 const case = { inputs: [10, 32], return: 42} // succeed    
@@ -105,7 +105,7 @@ catch(err => { /* tests failed */ });
 ## case.return / case.error
 Expected returned output of a function / Expected error thrown by a function.
 
-```
+```javascript
 function f(x, y){
   if(y === 0){
     throw new Error("division by 0");
@@ -114,7 +114,7 @@ function f(x, y){
 }
 ```
 
-```
+```javascript
 const iotest = require('iotest');
 
 const cases = [
@@ -130,7 +130,7 @@ catch(err => { /* tests failed */ });
 ## case.resolve / case.reject
 Expected resolved value / Expected rejected error, of the promise returned by a function.
 
-```
+```javascript
 function f(x, y){
   return new Promise( (resolve, reject) => {
     if(y === 0){
@@ -142,7 +142,7 @@ function f(x, y){
 }
 ```
 
-```
+```javascript
 const iotest = require('iotest');
 
 const cases = [
@@ -158,7 +158,7 @@ catch(err => { /* tests failed */ });
 ## depth traversal
 if `case.return`, `case.error`, `case.resolve` or `case.reject` is set with an *Object*, then it is deeply traversed to make sure each property exists with the right value in the `output`.
 
-```
+```javascript
 function f(x){
   return {
     x: x,
@@ -167,7 +167,7 @@ function f(x){
 }
 ```
 
-```
+```javascript
 const iotest = require('iotest');
 
 const cases = [
@@ -184,7 +184,7 @@ catch(err => { /* tests failed */ });
 
 if `case.return`, `case.error`, `case.resolve` or `case.reject` is set with an *Array*, then each item is deeply traversed.
 
-```
+```javascript
 function f(x){
   return [
     { x: x, y: x + 1 },
@@ -194,7 +194,7 @@ function f(x){
 
 ```
 
-```
+```javascript
 const iotest = require('iotest');
 
 const case = {
